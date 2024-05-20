@@ -18,10 +18,11 @@
 ```bash
 ├─doc // SDK提供的文档
 ├─galaxy_sdk // SDK提供的基础库
-└─qemu
-    ├─.settings // 配置文件
-    ├─Release // 编译中间文件，切换分支时请手动删除一次
-    └─user // 用户编写的文件，主要在此进行添加
+├─qemu
+│   ├─.settings // 配置文件
+│   ├─Release // 编译中间文件，切换分支时请手动删除一次
+│   └─user // 用户编写的文件，主要在此进行添加
+└─refence_code // 官方提供的CNN参考代码
 ```
 
 ## 仓库使用

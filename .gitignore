@@ -1,1 +1,4 @@
 qemu/Release/
+refence_code/1_VAD_python/__pycache__
+refence_code/2_VAD_c/*.exe
+refence_code/2_VAD_c/.vscode
