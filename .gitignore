@@ -1,4 +1,13 @@
 qemu/Release/
+
 refence_code/1_VAD_python/__pycache__
 refence_code/2_VAD_c/*.exe
 refence_code/2_VAD_c/.vscode
+
+data_set/3_utils/visualize/__pycache__
+data_set/3_utils/visualize/*.wav
+data_set/3_utils/visualize/*.txt
+
+data_set/3_utils/wav_trans/__pycache__
+data_set/3_utils/wav_trans/*.wav
+

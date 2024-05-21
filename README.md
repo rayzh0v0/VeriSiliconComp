@@ -16,6 +16,10 @@
 ## 仓库结构
 
 ```bash
+├─data_set // 存放数据集
+│  ├─1_lable // 存放标签
+│  ├─2_voice // 存放采样整理后的8000Hz声音
+│  └─3_utils // 存放有用的脚本工具
 ├─doc // SDK提供的文档
 ├─galaxy_sdk // SDK提供的基础库
 ├─qemu
