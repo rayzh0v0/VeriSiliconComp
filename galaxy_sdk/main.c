@@ -40,7 +40,7 @@
 #include "massage.h"
 #include "vpi_event.h"
 
-static void task_init_app(void *param)
+static void init_app()
 {
     BoardDevice board_dev;
 
@@ -51,7 +51,6 @@ static void task_init_app(void *param)
         uart_printf("Board: %s", board_dev.name);
 
     uart_printf("Hello VeriHealthi!\r\n");
-    osal_delete_task(NULL);
 }
 
 int main(void)
@@ -70,8 +69,14 @@ int main(void)
         uart_printf("soc init done");
     }
 
-    osal_create_task(task_init_app, "init_app", 512, 7, NULL);
-    massage_init();
+    init_app();
+
+    // Message system init
+    if(massage_init() == -1) {
+        uart_printf("massage init error");
+        goto exit;
+    }
+
     osal_start_scheduler();
 
 exit:

@@ -1,8 +1,19 @@
+/*
+ * Implementation function description:
+ * Custom task loop sends data from the arr array.
+ * System task receives data sent by custom task and displays them on console.
+ */
+
 #include "massage.h"
 #include "uart_printf.h"
 #include "osal_task_api.h"
 #include "bsp.h"
 #include "vpi_event.h"
+
+uint32_t arr[] = {
+	0xa5a0, 0xa5a1, 0xa5a2, 0xa5a3, 0xa5a4,
+	0xa5a5, 0xa5a6, 0xa5a7, 0xa5a8, 0xa5a9
+};
 
 /**
  * @brief Call back function of system manager
@@ -10,13 +21,10 @@
  *
  * @param Same as EventHandler
  *
- * @return Any data as an ack. Here use 0 (Based on current understanding)
+ * @return Any ack back(Based on current understanding)
  */
-static int sys_manager_handler(void *cobj, uint32_t event_id, void *param) {
-	unsigned int val;
-
-	val = (unsigned int)param;
-	uart_printf("system rcv: %x", val);
+static int system_manager_handler(void *cobj, uint32_t event_id, void *param) {
+	uart_printf("system rcv: %lx", *(uint32_t*)param);
 
 	return 0;
 }
@@ -27,13 +35,12 @@ static int sys_manager_handler(void *cobj, uint32_t event_id, void *param) {
  *
  * @param Same as EventHandler
  *
- * @return Any data as an ack. Here use 0 (Based on current understanding)
+ * @return Any ack back(Based on current understanding)
  */
 static int custom_manager_handler(void *cobj, uint32_t event_id, void *param) {
 
     return 0;
 }
-
 
 /**
  * @brief Call back function of system massage task
@@ -42,11 +49,11 @@ static int custom_manager_handler(void *cobj, uint32_t event_id, void *param) {
  * @param Params from osal_create_task
  *
  */
-static void task_sys_mgr(void *param)
+static void task_system_mgr(void *param)
 {
 	void* pSysManager;
 
-	pSysManager = vpi_event_new_manager(COBJ_SYS_MGR, sys_manager_handler);
+	pSysManager = vpi_event_new_manager(COBJ_SYS_MGR, system_manager_handler);
 	vpi_event_register(EVENT_SYS_TEST, pSysManager);
 
 	uart_printf("system task register cplt");
@@ -69,21 +76,21 @@ static void task_custom_mgr(void *param)
 	osal_sleep(1000);
 
 	void* pCustomManager;
-	void* val;
+	int i = 0;
+	int arr_len = sizeof(arr) / sizeof(arr[0]);
 
 	pCustomManager = vpi_event_new_manager(COBJ_CUSTOM_MGR, custom_manager_handler);
 	vpi_event_register(EVENT_SYS_TEST, pCustomManager);
 
 	uart_printf("custom task register cplt");
 
-	val = (void*)0xa5a5;
-
 	while(1)
 	{
-		uart_printf("custom send: %x", (unsigned int)val);
-		vpi_event_notify(EVENT_SYS_TEST, val++);
+		uart_printf("custom send: %lx", *arr+i);
+		vpi_event_notify(EVENT_SYS_TEST, (void*)(arr+i));
+		i = (i + 1) % arr_len;
 		osal_sleep(1000);
-		vpi_event_listen(pCustomManager); // From development manual I know need to do this, but why?
+		vpi_event_listen(pCustomManager);
 	}
 }
 
@@ -91,11 +98,20 @@ static void task_custom_mgr(void *param)
  * @brief Initialize massage tasks
  *
  */
-void massage_init(void)
+int massage_init(void)
 {
-	osal_create_task(task_sys_mgr, "my_sys", 256, 4, NULL);
-	osal_create_task(task_custom_mgr, "my_custom", 256, 5, NULL);
+	// create system message task
+	if(osal_create_task(task_system_mgr, "my_system", 256, 4, NULL) == NULL){
+		uart_printf("system message create error");
+		return -1;
+	}
 
-	return;
+	// create custom message task
+	if(osal_create_task(task_custom_mgr, "my_custom", 256, 5, NULL) == NULL){
+		uart_printf("custom message create error");
+		return -1;
+	}
+
+	return 0;
 }
 

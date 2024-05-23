@@ -1,6 +1,6 @@
 #ifndef __MASSAGE_H__
 #define __MASSAGE_H__
 
-void massage_init();
+int massage_init();
 
 #endif
